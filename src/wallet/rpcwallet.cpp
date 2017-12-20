@@ -503,7 +503,7 @@ UniValue sendtoaddress(const JSONRPCRequest& request)
 
     // send the change to a custom address
     if (!request.params[8].isNull()) {
-        CTxDestination change_address = DecodeDestination(request.params[0].get_str());
+        CTxDestination change_address = DecodeDestination(request.params[8].get_str());
         if (!IsValidDestination(change_address)) {
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid change address: ")+request.params[8].get_str());
         }
@@ -1095,7 +1095,7 @@ UniValue sendmany(const JSONRPCRequest& request)
 
     // send the change to a custom address
     if (!request.params[8].isNull()) {
-        CTxDestination change_address = DecodeDestination(request.params[0].get_str());
+        CTxDestination change_address = DecodeDestination(request.params[8].get_str());
         if (!IsValidDestination(change_address)) {
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid change address: ")+request.params[8].get_str());
         }
