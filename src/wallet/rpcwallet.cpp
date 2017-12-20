@@ -425,7 +425,7 @@ UniValue sendtoaddress(const JSONRPCRequest& request)
         return NullUniValue;
     }
 
-    if (request.fHelp || request.params.size() < 2 || request.params.size() > 8)
+    if (request.fHelp || request.params.size() < 2 || request.params.size() > 9)
         throw std::runtime_error(
             "sendtoaddress \"address\" amount ( \"comment\" \"comment_to\" subtractfeefromamount replaceable conf_target \"estimate_mode\")\n"
             "\nSend an amount to a given address.\n"
@@ -446,6 +446,7 @@ UniValue sendtoaddress(const JSONRPCRequest& request)
             "       \"UNSET\"\n"
             "       \"ECONOMICAL\"\n"
             "       \"CONSERVATIVE\"\n"
+            "9. custom_change_address (string, optional) If no address is specified here the change will go to newly generated address in the wallet"
             "\nResult:\n"
             "\"txid\"                  (string) The transaction id.\n"
             "\nExamples:\n"
@@ -500,6 +501,14 @@ UniValue sendtoaddress(const JSONRPCRequest& request)
         }
     }
 
+    // send the change to a custom address
+    if (!request.params[8].isNull()) {
+        CTxDestination change_address = DecodeDestination(request.params[0].get_str());
+        if (!IsValidDestination(change_address)) {
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid change address: ")+request.params[8].get_str());
+        }
+        coin_control.destChange = change_address;
+    }
 
     EnsureWalletIsUnlocked(pwallet);
 
@@ -999,7 +1008,7 @@ UniValue sendmany(const JSONRPCRequest& request)
         return NullUniValue;
     }
 
-    if (request.fHelp || request.params.size() < 2 || request.params.size() > 8)
+    if (request.fHelp || request.params.size() < 2 || request.params.size() > 9)
         throw std::runtime_error(
             "sendmany \"fromaccount\" {\"address\":amount,...} ( minconf \"comment\" [\"address\",...] replaceable conf_target \"estimate_mode\")\n"
             "\nSend multiple times. Amounts are double-precision floating point numbers."
@@ -1027,7 +1036,8 @@ UniValue sendmany(const JSONRPCRequest& request)
             "       \"UNSET\"\n"
             "       \"ECONOMICAL\"\n"
             "       \"CONSERVATIVE\"\n"
-             "\nResult:\n"
+            "9. custom_change_address (string, optional) If no address is specified here the change will go to newly generated address in the wallet"  
+            "\nResult:\n"
             "\"txid\"                   (string) The transaction id for the send. Only 1 transaction is created regardless of \n"
             "                                    the number of addresses.\n"
             "\nExamples:\n"
@@ -1081,6 +1091,15 @@ UniValue sendmany(const JSONRPCRequest& request)
         if (!FeeModeFromString(request.params[7].get_str(), coin_control.m_fee_mode)) {
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid estimate_mode parameter");
         }
+    }
+
+    // send the change to a custom address
+    if (!request.params[8].isNull()) {
+        CTxDestination change_address = DecodeDestination(request.params[0].get_str());
+        if (!IsValidDestination(change_address)) {
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid change address: ")+request.params[8].get_str());
+        }
+        coin_control.destChange = change_address;
     }
 
     std::set<CTxDestination> destinations;
