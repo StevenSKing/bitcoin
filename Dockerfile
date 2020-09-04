@@ -45,6 +45,7 @@ RUN apt-get update && apt-get install -y \
     libevent-2.1-6 \
     libevent-pthreads-2.1-6 \
     libzmq5 \
+    wget \
   && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /app/src/src/bitcoind /usr/local/bin/
