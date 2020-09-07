@@ -48,7 +48,7 @@ RUN apt-get update && apt-get install -y \
     wget \
   && rm -rf /var/lib/apt/lists/*
 
-COPY --from=build /app/src/src/bitcoind /usr/local/bin/
+COPY --from=build /app/src/src/bitcoind /app/src/src/bitcoin-cli /usr/local/bin/
 COPY entrypoint.sh /usr/local/bin/bitcoind.sh
 
 ENTRYPOINT ["bitcoind.sh"]
