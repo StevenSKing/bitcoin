@@ -7,6 +7,8 @@ set -e
 : ${RPCBIND:=$([[ -n $RPCUSER && -n $RPCPASSWORD || -n $RPCAUTH ]] && echo 0)}
 : ${RPCALLOWIP:=$([[ -n $RPCUSER && -n $RPCPASSWORD || -n $RPCAUTH ]] && echo 0/0)}
 
+touch /etc/bitcoin.conf
+chmod og-rw /etc/bitcoin.conf
 cat <<-:: >/etc/bitcoin.conf
 	${SERVER:+server=$SERVER}
 	${TESTNET:+testnet=$TESTNET}
